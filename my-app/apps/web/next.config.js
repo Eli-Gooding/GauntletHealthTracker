@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   transpilePackages: ["@workspace/ui"],
   experimental: {
     // This will allow Next.js to resolve packages from the monorepo
@@ -7,5 +7,3 @@ const nextConfig = {
     serverActions: true,
   }
 }
-
-export default nextConfig
