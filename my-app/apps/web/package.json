@@ -17,6 +17,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@workspace/ui": "file:../../packages/ui",
     "autoprefixer": "^10.4.16",
+    "babel-loader": "^9.1.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
