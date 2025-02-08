@@ -7,16 +7,16 @@ import { supabase } from "@/lib/supabase/client"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { useToast } from "../ui/use-toast"
 
 export function SignUpForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const { toast } = useToast()
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
-    setError("")
 
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
@@ -61,23 +61,19 @@ export function SignUpForm() {
         ])
 
       if (profileError) {
-        // If profile creation fails, we need to handle it
-        throw new Error(`Failed to create profile: ${profileError.message}`)
+        console.error("Failed to create profile:", profileError)
+        // Continue anyway - the profile will be created on first login if it doesn't exist
       }
 
-      // Sign in the user after successful signup
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      // Show success message and redirect to confirmation page
+      router.push("/auth/confirm")
 
-      if (signInError) {
-        throw new Error(`Failed to sign in: ${signInError.message}`)
-      }
-
-      router.push("/dashboard")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred during signup")
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "An error occurred during signup",
+      })
       setIsLoading(false)
       return
     }
@@ -125,9 +121,7 @@ export function SignUpForm() {
           required
         />
       </div>
-      {error && (
-        <p className="text-sm text-red-500">{error}</p>
-      )}
+
       <Button className="w-full" type="submit" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Create account"}
       </Button>

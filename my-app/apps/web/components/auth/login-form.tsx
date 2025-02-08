@@ -7,35 +7,56 @@ import { supabase } from "@/lib/supabase/client"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { useToast } from "../ui/use-toast"
 
 export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const { toast } = useToast()
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
-    setError("")
 
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
 
+    try {
+      // Try to sign in
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+      if (signInError) {
+        throw new Error(signInError.message)
+      }
 
-    if (error) {
-      setError(error.message)
+      // Check if email is verified
+      if (!data.user?.email_confirmed_at) {
+        // Sign out immediately if email is not verified
+        await supabase.auth.signOut()
+        
+        toast({
+          variant: "destructive",
+          title: "Email not verified",
+          description: "Please check your email and verify your account before logging in."
+        })
+        setIsLoading(false)
+        return
+      }
+
+      router.refresh()
+      router.push("/dashboard")
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err instanceof Error ? err.message : "An error occurred during login"
+      })
       setIsLoading(false)
-      return
     }
-
-    router.refresh()
-    router.push("/dashboard")
   }
 
   return (
@@ -60,9 +81,7 @@ export function LoginForm() {
           required
         />
       </div>
-      {error && (
-        <p className="text-sm text-red-500">{error}</p>
-      )}
+
       <Button className="w-full" type="submit" disabled={isLoading}>
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>

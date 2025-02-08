@@ -6,6 +6,7 @@ import { InfectionChart } from "@/components/dashboard/infection-chart"
 import { FoodDeliveryList } from "@/components/dashboard/food-delivery-list"
 import { HealthStatusButton } from "@/components/dashboard/health-status-button"
 import { UserStatus } from "@/components/dashboard/user-status"
+import { AccountSettings } from "@/components/dashboard/account-settings"
 
 export default function DashboardPage() {
   const { session, loading: authLoading } = useAuth()
@@ -41,6 +42,9 @@ export default function DashboardPage() {
       <div className="fixed bottom-8 right-8 flex flex-col items-end gap-2">
         <HealthStatusButton userId={session.user.id} />
         <UserStatus />
+      </div>
+      <div className="fixed bottom-8 left-8">
+        <AccountSettings />
       </div>
     </div>
   )

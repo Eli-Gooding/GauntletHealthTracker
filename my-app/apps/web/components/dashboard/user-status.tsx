@@ -8,6 +8,7 @@ import { eventBus, EVENTS } from "@/lib/events"
 export function UserStatus() {
   const { session } = useAuth()
   const [healthStatus, setHealthStatus] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!session?.user?.id) return
@@ -30,24 +31,94 @@ export function UserStatus() {
     }
   }, [session?.user?.id])
 
-  async function fetchHealthStatus() {
-    console.log('[UserStatus] Fetching health status for user:', session?.user?.id)
-    const { data, error } = await supabase
+  async function createUserProfile() {
+    if (!session?.user) return null
+
+    console.log('[UserStatus] Creating user profile for:', session.user.id)
+    const { error } = await supabase
       .from("users")
-      .select("health_status")
-      .eq("id", session?.user?.id)
-      .single()
+      .insert([
+        {
+          id: session.user.id,
+          email: session.user.email,
+          full_name: session.user.user_metadata.full_name,
+          room_number: session.user.user_metadata.room_number,
+          health_status: "healthy"
+        }
+      ])
 
     if (error) {
-      console.error("[UserStatus] Error fetching health status:", error)
+      console.error("[UserStatus] Error creating user profile:", error)
+      return null
+    }
+
+    return "healthy" // Return default health status
+  }
+
+  async function fetchHealthStatus() {
+    if (!session?.user?.id) {
+      console.log('[UserStatus] No user session, skipping fetch')
       return
     }
 
-    console.log('[UserStatus] Setting health status to:', data.health_status)
-    setHealthStatus(data.health_status)
+    if (!session?.user?.email_confirmed_at) {
+      console.log('[UserStatus] User email not confirmed yet')
+      setError('Please confirm your email to access the dashboard')
+      return
+    }
+
+    try {
+      console.log('[UserStatus] Fetching health status for user:', session.user.id)
+      const { data, error } = await supabase
+        .from("users")
+        .select("health_status")
+        .eq("id", session.user.id)
+        .single()
+
+      if (error?.code === "PGRST116") { // Record not found
+        console.log('[UserStatus] User profile not found, creating one')
+        const defaultStatus = await createUserProfile()
+        if (defaultStatus) {
+          setError(null)
+          setHealthStatus(defaultStatus)
+          return
+        }
+      } else if (error) {
+        console.error("[UserStatus] Error fetching health status:", error)
+        setError('Unable to fetch health status')
+        return
+      }
+
+      if (!data) {
+        console.error("[UserStatus] No health status data found")
+        setError('No health status found')
+        return
+      }
+
+      console.log('[UserStatus] Setting health status to:', data.health_status)
+      setError(null)
+      setHealthStatus(data.health_status)
+    } catch (err) {
+      console.error("[UserStatus] Unexpected error:", err)
+      setError('An unexpected error occurred')
+    }
   }
 
-  if (!healthStatus) return null
+  if (error) {
+    return (
+      <div className="text-center text-sm text-red-500">
+        {error}
+      </div>
+    )
+  }
+
+  if (!healthStatus) {
+    return (
+      <div className="text-center text-sm text-muted-foreground">
+        Loading health status...
+      </div>
+    )
+  }
 
   const statusColor = healthStatus === "healthy" ? "text-green-500" : "text-red-500"
 
