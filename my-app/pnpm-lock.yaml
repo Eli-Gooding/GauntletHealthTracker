@@ -54,9 +54,15 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.48.1
         version: 2.48.1
-      '@workspace/ui':
-        specifier: file:../../packages/ui
-        version: file:packages/ui(@types/react@18.3.0)(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2)))
+      '@types/node':
+        specifier: ^20
+        version: 20.17.10
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.0
+      '@types/react-dom':
+        specifier: ^18.2.0
+        version: 18.3.1
       autoprefixer:
         specifier: ^10.4.16
         version: 10.4.20(postcss@8.4.49)
@@ -102,22 +108,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2)))
-    devDependencies:
-      '@types/node':
-        specifier: ^20
-        version: 20.17.10
-      '@types/react':
-        specifier: 18.3.0
-        version: 18.3.0
-      '@types/react-dom':
-        specifier: 18.3.1
-        version: 18.3.1
-      '@workspace/eslint-config':
-        specifier: file:../../packages/eslint-config
-        version: link:../../packages/eslint-config
-      '@workspace/typescript-config':
-        specifier: file:../../packages/typescript-config
-        version: link:../../packages/typescript-config
       typescript:
         specifier: ^5
         version: 5.7.2
@@ -959,9 +949,6 @@ packages:
 
   '@webassemblyjs/wast-printer@1.14.1':
     resolution: {integrity: sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw==}
-
-  '@workspace/ui@file:packages/ui':
-    resolution: {directory: packages/ui, type: directory}
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -4230,22 +4217,6 @@ snapshots:
     dependencies:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
-
-  '@workspace/ui@file:packages/ui(@types/react@18.3.0)(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2)))':
-    dependencies:
-      '@radix-ui/react-slot': 1.1.2(@types/react@18.3.0)(react@19.0.0)
-      class-variance-authority: 0.7.1
-      clsx: 2.1.1
-      lucide-react: 0.456.0(react@19.0.0)
-      next-themes: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-      tailwind-merge: 2.5.5
-      tailwindcss-animate: 1.0.7(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@20.17.10)(typescript@5.7.2)))
-      zod: 3.24.1
-    transitivePeerDependencies:
-      - '@types/react'
-      - tailwindcss
 
   '@xtuc/ieee754@1.2.0': {}
 
