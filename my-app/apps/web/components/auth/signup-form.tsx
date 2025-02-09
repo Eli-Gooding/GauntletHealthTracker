@@ -65,8 +65,22 @@ export function SignUpForm() {
         // Continue anyway - the profile will be created on first login if it doesn't exist
       }
 
-      // Show success message and redirect to confirmation page
-      router.push("/auth/confirm")
+      // Automatically sign in the user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        throw new Error(signInError.message)
+      }
+
+      // Show success message and redirect to dashboard
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created and you're now signed in.",
+      })
+      router.push("/dashboard")
 
     } catch (err) {
       toast({
