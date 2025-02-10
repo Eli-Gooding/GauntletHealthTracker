@@ -15,6 +15,12 @@ import {
 interface User {
   full_name: string
   room_number: string
+  lunch_note: string | null
+  dinner_note: string | null
+  other_note: string | null
+  lunch_note_updated_at: string | null
+  dinner_note_updated_at: string | null
+  other_note_updated_at: string | null
 }
 
 export function FoodDeliveryList() {
@@ -45,7 +51,7 @@ export function FoodDeliveryList() {
     try {
       const { data, error } = await supabase
         .from("users")
-        .select("full_name, room_number")
+        .select("full_name, room_number, lunch_note, dinner_note, other_note, lunch_note_updated_at, dinner_note_updated_at, other_note_updated_at")
         .eq("health_status", "sick")
         .order("room_number", { ascending: true })
 
@@ -70,18 +76,33 @@ export function FoodDeliveryList() {
     )
   }
 
+  function formatLastUpdated(timestamp: string | null): string {
+    if (!timestamp) return 'Not set';
+    
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
+  }
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Room Number</TableHead>
+          <TableHead>Lunch Note</TableHead>
+          <TableHead>Dinner Note</TableHead>
+          <TableHead>Other Note</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={2} className="text-center text-muted-foreground">
+            <TableCell colSpan={5} className="text-center text-muted-foreground">
               No sick challengers at the moment
             </TableCell>
           </TableRow>
@@ -90,6 +111,36 @@ export function FoodDeliveryList() {
             <TableRow key={user.room_number}>
               <TableCell>{user.full_name}</TableCell>
               <TableCell>{user.room_number}</TableCell>
+              <TableCell>
+                {user.lunch_note && (
+                  <div>
+                    <div>{user.lunch_note}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Last updated: {formatLastUpdated(user.lunch_note_updated_at)}
+                    </div>
+                  </div>
+                )}
+              </TableCell>
+              <TableCell>
+                {user.dinner_note && (
+                  <div>
+                    <div>{user.dinner_note}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Last updated: {formatLastUpdated(user.dinner_note_updated_at)}
+                    </div>
+                  </div>
+                )}
+              </TableCell>
+              <TableCell>
+                {user.other_note && (
+                  <div>
+                    <div>{user.other_note}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Last updated: {formatLastUpdated(user.other_note_updated_at)}
+                    </div>
+                  </div>
+                )}
+              </TableCell>
             </TableRow>
           ))
         )}

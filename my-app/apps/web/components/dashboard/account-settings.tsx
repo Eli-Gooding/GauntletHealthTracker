@@ -25,6 +25,9 @@ export function AccountSettings() {
   const [formData, setFormData] = useState({
     fullName: session?.user?.user_metadata?.full_name || "",
     roomNumber: session?.user?.user_metadata?.room_number || "",
+    lunchNote: session?.user?.user_metadata?.lunch_note || "",
+    dinnerNote: session?.user?.user_metadata?.dinner_note || "",
+    otherNote: session?.user?.user_metadata?.other_note || "",
   })
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,6 +40,9 @@ export function AccountSettings() {
         data: {
           full_name: formData.fullName,
           room_number: formData.roomNumber,
+          lunch_note: formData.lunchNote,
+          dinner_note: formData.dinnerNote,
+          other_note: formData.otherNote,
         }
       })
 
@@ -48,6 +54,12 @@ export function AccountSettings() {
         .update({
           full_name: formData.fullName,
           room_number: formData.roomNumber,
+          lunch_note: formData.lunchNote,
+          dinner_note: formData.dinnerNote,
+          other_note: formData.otherNote,
+          lunch_note_updated_at: formData.lunchNote ? new Date().toISOString() : null,
+          dinner_note_updated_at: formData.dinnerNote ? new Date().toISOString() : null,
+          other_note_updated_at: formData.otherNote ? new Date().toISOString() : null,
         })
         .eq("id", session?.user?.id)
 
@@ -102,6 +114,33 @@ export function AccountSettings() {
               value={formData.roomNumber}
               onChange={(e) => setFormData(prev => ({ ...prev, roomNumber: e.target.value }))}
               required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lunchNote">Lunch Note</Label>
+            <Input
+              id="lunchNote"
+              value={formData.lunchNote}
+              onChange={(e) => setFormData(prev => ({ ...prev, lunchNote: e.target.value }))}
+              placeholder="Any special requests for lunch?"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dinnerNote">Dinner Note</Label>
+            <Input
+              id="dinnerNote"
+              value={formData.dinnerNote}
+              onChange={(e) => setFormData(prev => ({ ...prev, dinnerNote: e.target.value }))}
+              placeholder="Any special requests for dinner?"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="otherNote">Other Note</Label>
+            <Input
+              id="otherNote"
+              value={formData.otherNote}
+              onChange={(e) => setFormData(prev => ({ ...prev, otherNote: e.target.value }))}
+              placeholder="Any other notes or requests?"
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
